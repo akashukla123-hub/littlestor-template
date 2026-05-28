@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LittleStor | Premium Shopping</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo" onclick="showSection('home-section')">LittleStor<span style="color: #f59e0b;">.</span></div>
+        <div class="search-bar">
+            <input type="text" placeholder="Search products, brands and more...">
+            <button><i class="fas fa-search"></i></button>
+        </div>
+        <div class="nav-links">
+            <a href="#" onclick="showSection('home-section')"><i class="fas fa-home"></i> Home</a>
+            <a href="#" onclick="showSection('help-section')"><i class="fas fa-question-circle"></i> Help</a>
+            <a href="#" id="admin-link" style="display:none;" onclick="showSection('admin-panel')"><i class="fas fa-user-shield"></i> Admin</a>
+            <a href="#" id="user-orders-link" style="display:none;" onclick="showSection('orders-section')"><i class="fas fa-box"></i> Track Order</a>
+            <a href="#" id="login-link" onclick="showSection('auth-section')"><i class="fas fa-user"></i> Login</a>
+            <a href="#" class="cart-btn" onclick="toggleCart()">
+                <i class="fas fa-shopping-cart"></i> Cart (<span id="cart-count">0</span>)
+            </a>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Home Section -->
+        <section id="home-section">
+            <h2 class="section-title">Trending Products</h2>
+            <div class="products-grid" id="products-container"></div>
+        </section>
+
+        <!-- Modern Auth Section -->
+        <section id="auth-section" class="content-section" style="display:none;">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <h2 id="auth-title">Welcome Back</h2>
+                    <p id="auth-subtitle">Login to your LittleStor account</p>
+                </div>
+                <div class="auth-form-body">
+                    <div id="name-field-group" style="display:none;" class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" id="auth-name" placeholder="Enter your name">
+                    </div>
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" id="auth-email" placeholder="name@example.com">
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" id="auth-pass" placeholder="••••••••">
+                    </div>
+                    <button class="auth-primary-btn" onclick="handleAuth()">Continue</button>
+                    <div class="auth-footer">
+                        <p id="auth-switch-text">New to LittleStor? <span onclick="toggleAuthMode()" id="auth-switch-link">Create an account</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Panel -->
+        <section id="admin-panel" class="content-section" style="display:none; max-width: 1000px;">
+            <h2 class="section-title">Admin Dashboard</h2>
+            <div class="admin-tabs" style="display:flex; gap:10px; margin-bottom: 25px;">
+                <button onclick="switchAdminTab('add-tab')" class="admin-nav-btn active">Add Product</button>
+                <button onclick="switchAdminTab('stock-tab'); loadStockManagement();" class="admin-nav-btn">Inventory</button>
+                <button onclick="switchAdminTab('orders-tab'); loadAdminOrders();" class="admin-nav-btn">Orders</button>
+            </div>
+
+            <!-- Modern Add Product Tab -->
+            <div id="admin-add-tab" class="admin-tab-content admin-card">
+                <div class="admin-card-header">
+                    <h3><i class="fas fa-plus-circle"></i> Add New Inventory</h3>
+                    <p>Enter product details to publish it live</p>
+                </div>
+                <div class="admin-flex-container">
+                    <div class="admin-form-side">
+                        <div class="input-group">
+                            <label><i class="fas fa-tag"></i> Product Name</label>
+                            <input type="text" id="p-name" placeholder="e.g. Cotton Shirt" oninput="updatePreview()">
+                        </div>
+                        <div class="input-row flex">
+                            <div class="input-group">
+                                <label><i class="fas fa-rupee-sign"></i> Price</label>
+                                <input type="number" id="p-price" placeholder="499" oninput="updatePreview()">
+                            </div>
+                            <div class="input-group">
+                                <label><i class="fas fa-boxes"></i> Stock</label>
+                                <input type="number" id="p-stock" placeholder="10">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label><i class="fas fa-image"></i> Image URL</label>
+                            <input type="text" id="p-img" placeholder="Paste link here" oninput="updatePreview()">
+                        </div>
+                        <button class="auth-primary-btn" onclick="addNewProduct()" style="margin-top:20px;">Publish Product</button>
+                    </div>
+                    <div class="admin-preview-side">
+                        <label>Live Preview</label>
+                        <div id="live-preview-card" class="product-card" style="margin-top:10px; border: 2px dashed #cbd5e1; box-shadow:none;">
+                            <div style="padding:40px; text-align:center; color:#94a3b8;">
+                                <i class="fas fa-eye" style="font-size:30px;"></i>
+                                <p>Card Preview</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="admin-stock-tab" class="admin-tab-content" style="display:none;">
+                <div class="admin-card" style="padding:20px;">
+                    <table class="admin-table" id="stock-table-body"></table>
+                </div>
+            </div>
+
+            <div id="admin-orders-tab" class="admin-tab-content" style="display:none;">
+                <div id="admin-orders-list"></div>
+            </div>
+        </section>
+
+        <!-- Other sections (Orders, Help) remain similar but use modern classes -->
+        <section id="orders-section" class="content-section" style="display:none;">
+            <h2 class="section-title">Track Your Orders</h2>
+            <div id="user-orders-list"></div>
+        </section>
+
+        <section id="help-section" class="content-section" style="display:none;">
+            <h2 class="section-title">Help & Support</h2>
+            <div class="auth-container" style="margin:0; max-width: 100%;">
+                <input type="text" placeholder="Issue Subject" class="input-group" style="width:100%; padding:10px; margin-bottom:10px;">
+                <textarea placeholder="Describe your problem..." style="width:100%; height:100px; padding:10px; border-radius:8px; border:1.5px solid #e2e8f0;"></textarea>
+                <button class="auth-primary-btn" onclick="alert('Ticket submitted!')">Submit Ticket</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Address Modal & Cart Panel remain as per previous logic -->
+    <div id="address-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Delivery Details</h3>
+            <input type="text" id="cust-phone" placeholder="Phone Number">
+            <input type="text" id="cust-address" placeholder="Full Address">
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="auth-primary-btn" style="background:#10b981;" onclick="placeOrder()">Confirm Order</button>
+                <button class="auth-primary-btn" style="background:#6b7280;" onclick="closeAddressModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="cart-panel" id="cart-panel">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="close-btn" onclick="toggleCart()">&times;</button>
+        </div>
+        <div class="cart-items" id="cart-items"></div>
+        <div class="cart-footer">
+            <h4>Total: ₹<span id="cart-total">0</span></h4>
+            <button class="checkout-btn" onclick="openAddressModal()">Checkout Now</button>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-about">
+                <h3>About LittleStor</h3>
+                <p>Premium e-commerce platform for smart shoppers.</p>
+            </div>
+            <div class="footer-info">
+                <h3>Contact</h3>
+                <p>Owner: <strong>Akash Shukla</strong></p>
+                <p>Email: support@littlestor.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 LittleStor. Managed by Akash Shukla.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
